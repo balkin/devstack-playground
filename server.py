@@ -22,8 +22,14 @@ PORT = 8000
 
 conn = mysql.connector.connect(user='root', password='Passw0rd', database='nova_cell1')
 query1 = "SELECT uuid, display_name from instances where vm_state = 'active'"
-query2 = "SELECT mac_address, device_id from ports"
+query2 = "SELECT mac_address, device_id from neutron.ports"
 
+# TODO: Refactor it
+ports_dict = {}
+ports_cursor = conn.cursor()
+ports_cursor.execute(query2)
+for x in ports_cursor.fetchall():
+    ports_dict[x[1]] = x[0]
 
 class OpenstackHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -35,11 +41,11 @@ class OpenstackHandler(BaseHTTPRequestHandler):
         self.end_headers()
         response = []
 
-        mycursor = conn.cursor()
-        mycursor.execute(query1)
-        for x in mycursor.fetchall():
+        instances_cursor = conn.cursor()
+        instances_cursor.execute(query1)
+        for x in instances_cursor.fetchall():
             # Пишу как явист без list comprehensions, но потом отрефакторю по-питоньи
-            entry = {"instance_id": x[0], "interfaces": []}
+            entry = {"instance_id": x[0], "interfaces": [ports_dict[x[0]]]}
             response.append(entry)
 
         self.wfile.write(bytes(json.dumps(response), 'utf8'))
