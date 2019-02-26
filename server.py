@@ -7,7 +7,10 @@ PORT = 8000
 
 # Handler = http.server.SimpleHTTPRequestHandler
 # Запустить пару виртуальных машин (можно 2)
-# Из базы достать: SELECT uuid, display_name from instances where vm_state = 'active' SELECT mac_address, device_id from ports  Написать HTTP сервис, который выдает следующий json: [
+# Из базы достать: 
+# SELECT uuid, display_name from instances where vm_state = 'active'
+# SELECT mac_address, device_id from ports
+# Написать HTTP сервис, который выдает следующий json: [
 # {
 # instance_id: «xxxxxx»,
 # interfaces: [
