@@ -7,7 +7,7 @@ PORT = 8000
 
 # Handler = http.server.SimpleHTTPRequestHandler
 # Запустить пару виртуальных машин (можно 2)
-# Из базы достать: SELECT uuid, display_name from instances where vm_state = 'active' SELECT mac_address, device_id from ports  Написать HTTP сервис, который выдает следующий json: [
+# Из базы достать: SELECT uuid, display_name from instances where vm_state = 'active' SELECT mac_address, device_id from ports  Написать HTTP сервис, который выдает следующий json: [
 # {
 # instance_id: «xxxxxx»,
 # interfaces: [
@@ -19,7 +19,7 @@ PORT = 8000
 
 conn = mysql.connector.connect(user='root', password='Passw0rd', database='nova_cell1')
 query1 = "SELECT uuid, display_name from instances where vm_state = 'active'"
-query2 = "SELECT mac_address, device_id from ports "
+query2 = "SELECT mac_address, device_id from ports"
 
 
 class OpenstackHandler(BaseHTTPRequestHandler):
