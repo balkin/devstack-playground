@@ -1,0 +1,14 @@
+[Unit]
+Description=pythonrestapiservice
+After=syslog.target network.target
+
+[Service]
+User=baron
+WorkingDirectory=/home/baron
+ExecStart=/home/baron/venv/bin/python /home/baron/server.py
+Restart=on-abort
+StandardOutput=syslog+console
+StandardError=syslog+console
+
+[Install]
+WantedBy=multi-user.target
