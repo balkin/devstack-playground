@@ -41,8 +41,6 @@ ports_ts = 0
 
 
 class OpenstackHandler(BaseHTTPRequestHandler):
-    def __init__(self, request, client_address, server):
-        super().__init__(request, client_address, server)
 
     def ok_headers(self, content_type='application/json'):
         self.send_response(200)
@@ -51,7 +49,8 @@ class OpenstackHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     # This method is used for list comprehensions in /realtime
-    def one_instance(self, ports_cursor, uuid):
+    @staticmethod
+    def one_instance(ports_cursor, uuid):
         ports_cursor.execute(query_one_port, {"uuid": uuid})
         return {"instance_id": uuid, "interfaces": [mac for (mac, device_id) in ports_cursor.fetchall()]}
 
@@ -66,7 +65,8 @@ class OpenstackHandler(BaseHTTPRequestHandler):
             ports_cursor.close()
 
     # This method is used for updating ports data in /cached
-    def maybe_update_cached_ports(self):
+    @staticmethod
+    def maybe_update_cached_ports():
         global ports_ts, ports_dict
         if time.time() > ports_ts + CACHE_LIFETIME:
             ports_ts = time.time()
@@ -138,7 +138,7 @@ if __name__ == '__main__':
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("Server stopped on keyboard interrupt")
-    except:
+    except Exception:
         print("Server stopped on exception")
     finally:
         httpd.server_close()
