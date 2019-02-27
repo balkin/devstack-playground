@@ -5,6 +5,12 @@ from http.server import BaseHTTPRequestHandler
 
 import mysql.connector
 
+MYSQL_DB_PASSWORD = 'Passw0rd'
+
+MYSQL_DB_USER = 'root'
+
+CACHE_LIFETIME = 10
+
 INDEX_HTML = """<html><body>
             <a href="/realtime">first</a> | <a href="/cached">second</a> | <a href="/joined">third</a>
             </body></html>"""
@@ -24,7 +30,6 @@ PORT = 8000
 # }
 # ]
 
-conn = mysql.connector.connect(user='root', password='Passw0rd', database='nova_cell1')
 query_instances = "SELECT uuid, display_name from instances where vm_state = 'active'"
 query_ports = "SELECT mac_address, device_id from neutron.ports"
 query_one_port = "SELECT mac_address, device_id from neutron.ports WHERE device_id = %(uuid)s"
@@ -63,7 +68,7 @@ class OpenstackHandler(BaseHTTPRequestHandler):
     # This method is used for updating ports data in /cached
     def maybe_update_cached_ports(self):
         global ports_ts, ports_dict
-        if time.time() > ports_ts + 10:
+        if time.time() > ports_ts + CACHE_LIFETIME:
             ports_ts = time.time()
             ports_cursor = conn.cursor()
             try:
@@ -124,17 +129,19 @@ class OpenstackHandler(BaseHTTPRequestHandler):
             self.send_response_only(404, "Not found")
 
 
-socketserver.TCPServer.allow_reuse_address = True
-httpd = socketserver.TCPServer(("", PORT), OpenstackHandler)
-print("Listening on {}".format(PORT))
-try:
-    httpd.serve_forever()
-except KeyboardInterrupt:
-    print("Server stopped on keyboard interrupt")
-except:
-    print("Server stopped on exception")
-finally:
-    httpd.server_close()
-    conn.close()
+if __name__ == '__main__':
+    conn = mysql.connector.connect(user=MYSQL_DB_USER, password=MYSQL_DB_PASSWORD, database='nova_cell1')
+    socketserver.TCPServer.allow_reuse_address = True
+    httpd = socketserver.TCPServer(("", PORT), OpenstackHandler)
+    print("Listening on {}".format(PORT))
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("Server stopped on keyboard interrupt")
+    except:
+        print("Server stopped on exception")
+    finally:
+        httpd.server_close()
+        conn.close()
 
-print("DONE")
+    print("DONE")
