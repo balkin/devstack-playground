@@ -127,6 +127,7 @@ class OpenstackHandler(BaseHTTPRequestHandler):
             self.joined()
         else:
             self.send_response_only(404, "Not found")
+            self.end_headers()
 
 
 if __name__ == '__main__':
