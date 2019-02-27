@@ -89,8 +89,8 @@ class OpenstackHandler(BaseHTTPRequestHandler):
         instances_cursor = conn.cursor()
         try:
             instances_cursor.execute(query_instances)
-            response = [{"instance_id": uuid, "interfaces": ports_dict[uuid]} for (uuid, display_name) in
-                        instances_cursor.fetchall()]
+            response = [{"instance_id": uuid, "interfaces": ports_dict[uuid]}
+                        for (uuid, display_name) in instances_cursor.fetchall()]
             self.wfile.write(bytes(json.dumps(response, indent=True), 'utf8'))
         finally:
             instances_cursor.close()
